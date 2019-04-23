@@ -119,7 +119,7 @@ DATABASES = {
         'PORT': 3306, # 数据库端口
         'USER': 'itcast', # 数据库用户名
         'PASSWORD': '123456', # 数据库用户密码
-        'NAME': 'meiduo_mall' # 数据库名字
+        'NAME': 'meiduo_sy23' # 数据库名字
     },
 }
 
@@ -227,3 +227,6 @@ LOGGING = {
         },
     }
 }
+
+# 指定用户类型
+AUTH_USER_MODEL='users.User'
