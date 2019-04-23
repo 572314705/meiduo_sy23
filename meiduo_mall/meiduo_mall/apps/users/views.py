@@ -70,3 +70,12 @@ class UsernameCheckView(View):
             'count':count
         })
 
+class MobileCheckView(View):
+    def get(self,request,mobile):
+        # 接受　验证　在路由规定中已经完成了
+        # 处理：查询用户名对应对象的个数
+        count = User.objects.filter(mobile=mobile).count()
+        # 响应: 对应ａｊａｘ请求，返回ｊｓｏｎ数据
+        return http.JsonResponse({
+            'count':count
+        })
