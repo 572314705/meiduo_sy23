@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect
 from django.views import View
 from django import http
 from .models import User
@@ -53,29 +53,31 @@ class RegisterView(View):
         # 问题：直接将数据保存到表中，而此处的密码需要加密再保存
         # user = User.objects.create(username=user_name, password=pwd, mobile=phone)
         # 解决：使用认证模块提供的创建用户的方法
-        user = User.objects.create_user(username=user_name,password=pwd,mobile=phone)
+        user = User.objects.create_user(username=user_name, password=pwd, mobile=phone)
         # 3.2状态保持
         # request.session['user_id'] = user.id
-        login(request,user)
+        login(request, user)
         # 4.响应
         return redirect('/')
 
+
 class UsernameCheckView(View):
-    def get(self,request,username):
+    def get(self, request, username):
         # 接受　验证　在路由规定中已经完成了
         # 处理：查询用户名对应对象的个数
         count = User.objects.filter(username=username).count()
         # 响应: 对应ａｊａｘ请求，返回ｊｓｏｎ数据
         return http.JsonResponse({
-            'count':count
+            'count': count
         })
 
+
 class MobileCheckView(View):
-    def get(self,request,mobile):
+    def get(self, request, mobile):
         # 接受　验证　在路由规定中已经完成了
         # 处理：查询用户名对应对象的个数
         count = User.objects.filter(mobile=mobile).count()
         # 响应: 对应ａｊａｘ请求，返回ｊｓｏｎ数据
         return http.JsonResponse({
-            'count':count
+            'count': count
         })
