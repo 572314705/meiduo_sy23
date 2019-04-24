@@ -181,6 +181,13 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
+    "verify": { # 验证码
+                "BACKEND": "django_redis.cache.RedisCache",
+                "LOCATION": "redis://192.168.119.129:6379/2",
+                "OPTIONS": {
+                    "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                }
+            },
 }
 
 # session
