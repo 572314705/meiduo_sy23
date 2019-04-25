@@ -1,5 +1,7 @@
 from django.conf.urls import url
 from . import views
+
 urlpatterns = [
-    url('^image_codes/(?P<uuid>.+)/$',views.ImageCodeView.as_view())
+    url('^image_codes/(?P<uuid>.+)/$', views.ImageCodeView.as_view()),
+    url('^sms_codes/(?P<mobile>1[3456789]\d{9})/$', views.SmsCodeView.as_view()),
 ]
