@@ -61,7 +61,7 @@ class SmsCodeView(View):
         sms_code ='%06d' % random.randint(0,999999)
         # 2. 保存到redis中
         redis_cli.setex('sms'+ mobile,constants.SMS_CODE_EXPIRES,sms_code)
-        # # 3. 发短信
+        # # 3. 发短信  sms131
         # ccp = CCP()
         # ccp.send_template_sms(mobile,[sms_code,constants.SMS_CODE_EXPIRES],1)
         print(sms_code)
