@@ -79,6 +79,7 @@ class SmsCodeView(View):
         # ccp = CCP()
         # ccp.send_template_sms(mobile,[sms_code,constants.SMS_CODE_EXPIRES/60],1)
         # print(sms_code)
+
         # 调用任务
         send_sms.delay(mobile,[sms_code,constants.SMS_CODE_FLAG_EXPIRES/60],1)
 
