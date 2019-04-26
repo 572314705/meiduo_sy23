@@ -238,3 +238,6 @@ LOGGING = {
 
 # 指定用户类型
 AUTH_USER_MODEL='users.User'
+
+# 指定认证后端
+AUTHENTICATION_BACKENDS = ['meiduo_mall.utils.auth_backend.Meiduobackend']

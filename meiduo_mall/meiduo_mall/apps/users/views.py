@@ -116,7 +116,8 @@ class LoginView(View):
         # 2.4密码格式
         if not re.match('^[0-9A-Za-z]{8,20}$', pwd):
             return http.HttpResponseBadRequest('请输入一个8-20位的密码')
-        # 处理
+
+        # 处理 查询　状态保持
         user = authenticate(username=username, password=pwd)
         if user is None:
             # 用户名或密码错误
