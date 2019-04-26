@@ -56,11 +56,25 @@ class SmsCodeView(View):
         # 1.4 强制图形验证码过期
         redis_cli.delete(uuid)
 
+        # 2 在６０秒内只向指定手机号发一个短信
+        if redis_cli.get('sms_flag' + mobile):
+            return http.JsonResponse({
+                'code': RETCODE.SMSCODERR,
+                'errmsg': '短信验证码发送过于频繁',
+            })
         # 　处理
         # 1.生成随机的六位数
         sms_code ='%06d' % random.randint(0,999999)
-        # 2. 保存到redis中
-        redis_cli.setex('sms'+ mobile,constants.SMS_CODE_EXPIRES,sms_code)
+        # # 2. 保存到redis中
+        # redis_cli.setex('sms'+ mobile,constants.SMS_CODE_EXPIRES,sms_code)
+        # # 60秒内做一个是否发过短信的标记标记
+        # redis_cli.setex('sms_flag' + mobile,constants.SMS_CODE_FLAG_EXPIRES,1)
+        # 优化redis，只做一次交互
+        redis_pl = redis_cli.pipeline()
+        redis_pl.setex('sms'+ mobile,constants.SMS_CODE_EXPIRES,sms_code)
+        redis_pl.setex('sms_flag' + mobile,constants.SMS_CODE_FLAG_EXPIRES,1)
+        redis_pl.execute()
+
         # # 3. 发短信  sms131
         # ccp = CCP()
         # ccp.send_template_sms(mobile,[sms_code,constants.SMS_CODE_EXPIRES],1)

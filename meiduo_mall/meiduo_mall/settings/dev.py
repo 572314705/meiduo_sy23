@@ -15,7 +15,7 @@ import sys
 
 # __file__===>当前文件
 # os.path.abspath()  绝对路径
-# os.path.abspath()  上级路径
+# os.path.dirpath()  上级路径
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

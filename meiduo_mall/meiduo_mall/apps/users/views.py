@@ -57,7 +57,7 @@ class RegisterView(View):
         # 2.9.2判断是否为空，redis 数据库存储的短信验证是否过期
         if sms_code_redis is None:
             return http.HttpResponseBadRequest('短信验证码已经过期')
-        # 2.9.3 是否一至
+        # 2.9.3 是否一至 redis中存储的是bytes
         if sms_code_redis.decode() != msg_code_request:
             return http.HttpResponseBadRequest('短信验证码错误')
         # 2.9.4 强制过期
