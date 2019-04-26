@@ -8,7 +8,7 @@ from django import http
 from meiduo_mall.utils.response_code import RETCODE
 import random
 from meiduo_mall.libs.yuntongxun.sms import CCP
-
+from celery_tasks.sms.tasks import send_sms
 
 class ImageCodeView(View):
     '''生成图片'''
@@ -77,8 +77,11 @@ class SmsCodeView(View):
 
         # # 3. 发短信  sms131
         # ccp = CCP()
-        # ccp.send_template_sms(mobile,[sms_code,constants.SMS_CODE_EXPIRES],1)
-        print(sms_code)
+        # ccp.send_template_sms(mobile,[sms_code,constants.SMS_CODE_EXPIRES/60],1)
+        # print(sms_code)
+        # 调用任务
+        send_sms.delay(mobile,[sms_code,constants.SMS_CODE_FLAG_EXPIRES/60],1)
+
         # 响 应
         return http.JsonResponse({
             'code':RETCODE.OK,
