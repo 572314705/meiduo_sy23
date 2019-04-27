@@ -4,7 +4,7 @@ from django import http
 from .models import User
 import re
 # from django.contrib.auth.models import User
-from django.contrib.auth import login
+from django.contrib.auth import login,logout
 from django_redis import get_redis_connection
 from django.contrib.auth import authenticate
 
@@ -131,3 +131,13 @@ class LoginView(View):
             response.set_cookie('username',user.username,max_age=60*60*14*24)
             return response
             # 响应
+
+class LogoutView(View):
+    def get(self,request):
+        # 本质删除ｃｏｏｋｉｅ
+        logout(request)
+
+        # 删除cookie 提示
+        response = redirect('/')
+        response.delete_cookie('username')
+        return response
