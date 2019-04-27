@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     # 简化
     'users.apps.UsersConfig',
     'verifications.apps.VerificationsConfig',
+    'contents.apps.ContentsConfig',
 ]
 
 MIDDLEWARE = [

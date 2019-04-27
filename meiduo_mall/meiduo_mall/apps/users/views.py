@@ -127,5 +127,7 @@ class LoginView(View):
         else:
             # 用户名或密码正确，则状态保持
             login(request, user)
-            return redirect('/')
+            response = redirect('/')
+            response.set_cookie('username',user.username,max_age=60*60*14*24)
+            return response
             # 响应
