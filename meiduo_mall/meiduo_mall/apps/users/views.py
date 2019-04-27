@@ -4,9 +4,10 @@ from django import http
 from .models import User
 import re
 # from django.contrib.auth.models import User
-from django.contrib.auth import login,logout
+from django.contrib.auth import login, logout
 from django_redis import get_redis_connection
 from django.contrib.auth import authenticate
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class RegisterView(View):
@@ -106,6 +107,7 @@ class LoginView(View):
         # 接受
         username = request.POST.get('username')
         pwd = request.POST.get('pwd')
+        next_url = request.GET.get('next','/')
         # 　验证
         if not all([pwd, username]):
             return http.HttpResponseBadRequest('参数不完整')
@@ -127,13 +129,14 @@ class LoginView(View):
         else:
             # 用户名或密码正确，则状态保持
             login(request, user)
-            response = redirect('/')
-            response.set_cookie('username',user.username,max_age=60*60*14*24)
+            response = redirect(next_url)
+            response.set_cookie('username', user.username, max_age=60 * 60 * 14 * 24)
             return response
             # 响应
 
+
 class LogoutView(View):
-    def get(self,request):
+    def get(self, request):
         # 本质删除ｃｏｏｋｉｅ
         logout(request)
 
@@ -141,3 +144,10 @@ class LogoutView(View):
         response = redirect('/')
         response.delete_cookie('username')
         return response
+
+# 判断是否登录
+class InfoView(LoginRequiredMixin,View):
+    def get(self, request):
+        # if not request.user.is_authenticated:
+        #     return redirect('/login/')
+        return render(request, 'user_center_info.html')
