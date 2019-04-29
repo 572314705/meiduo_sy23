@@ -4,7 +4,9 @@ from django import http
 from QQLoginTool.QQtool import OAuthQQ
 from django.conf import settings
 from meiduo_mall.utils.response_code import RETCODE
-
+from .models import OAuthQQUser
+from meiduo_mall.utils import meiduo_signatrue
+from .constants import OPENID_EXPIRES
 
 class QQurlView(View):
     def get(self, request):
@@ -45,8 +47,26 @@ class QQopenidView(View):
             token = qq_tool.get_access_token(code)
             # 4.生成openid
             openid = qq_tool.get_open_id(token)
+
+            # 用openid判断是否绑定过ＱＱ用户
+            try:
+
+                qq_user = OAuthQQUser.objects.get(openid=openid)
+            except:
+                # 没有绑定，就返回一个绑定页面,初次绑定
+                # 加密
+                token = meiduo_signatrue.dumps({'openid':openid},OPENID_EXPIRES)
+                # 　展示页面
+                context = {'token': token}
+                return render(request, 'oauth_callback.html', context)
+            else:
+                # 查找到绑定的用户，就状态保持
+                pass
         except:
             openid = 0
         return http.HttpResponse(openid)
 
+    def post(self, request):
+        # 接收用户填写的数据，进行绑定
 
+        pass
