@@ -5,20 +5,25 @@ from django.conf import settings
 def dumps(json, expires):
     # 加密
     # 1.创建对象
-    Serializer(settings.SECRET_KEY, expires)
-    # ２．加密
-    json_str = Serializer.dumps(json)
-    # ３．返回字符串
+    serializer=Serializer(settings.SECRET_KEY, expires)
+    # ２．加密-bytes类型数据
+    json_str = serializer.dumps(json)
+    # ３．返回字符串-需要解码
     return json_str.decode()
 
 
 def loads(json_str, expires):
     # 解密
     # 　１．创建对象
-    Serializer(settings.SECRET_KEY, expires)
+    serializer=Serializer(settings.SECRET_KEY, expires)
     # 　２．解密
-    json = Serializer.loads(json_str)
-    # 　３．返回字符串
-    return json
+    try:
+        json = serializer.loads(json_str)
+    except:
+    # 如果字符串被修改，或过期，解密时会抛异常
+        return None
 
-    pass
+    else:
+        # 　３．返回字符串
+        return json
+

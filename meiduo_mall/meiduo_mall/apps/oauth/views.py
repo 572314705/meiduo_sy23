@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from django import http
 from QQLoginTool.QQtool import OAuthQQ
@@ -7,6 +7,9 @@ from meiduo_mall.utils.response_code import RETCODE
 from .models import OAuthQQUser
 from meiduo_mall.utils import meiduo_signatrue
 from .constants import OPENID_EXPIRES
+from users.models import User
+from django.contrib.auth import login
+
 
 class QQurlView(View):
     def get(self, request):
@@ -55,7 +58,7 @@ class QQopenidView(View):
             except:
                 # 没有绑定，就返回一个绑定页面,初次绑定
                 # 加密
-                token = meiduo_signatrue.dumps({'openid':openid},OPENID_EXPIRES)
+                token = meiduo_signatrue.dumps({'openid': openid}, OPENID_EXPIRES)
                 # 　展示页面
                 context = {'token': token}
                 return render(request, 'oauth_callback.html', context)
@@ -68,5 +71,38 @@ class QQopenidView(View):
 
     def post(self, request):
         # 接收用户填写的数据，进行绑定
+        # 接收
+        mobile = request.POST.get('mobile')
+        pwd = request.POST.get('pwd')
+        pic_code = request.POST.get('pic_code')
+        sms_code = request.POST.get('sms_code')
+        token = request.POST.get('access_token')
+        # 验证 ：非空　格式　短信验证　与注册相同　不再重复
+        # 解密openid
 
-        pass
+        json = meiduo_signatrue.loads(token, OPENID_EXPIRES)
+        if json is None:
+            return http.HttpResponseBadRequest('授权信息已经过期')
+        openid = json.get('openid')
+        # 处理
+        # 1.根据手机号查询用户对象
+        try:
+            user = User.objects.get(mobile=mobile)
+        except:
+            # 　2.如果为查询到对象，则新建用户对象
+            user = User.objects.create_user(username=mobile, password=pwd, mobile=mobile)
+        else:
+            # 3.如果查询到用户对象，则判断密码
+            if not user.check_password(pwd):
+                # 3.1如果密码错误，则提示
+                return http.HttpResponseBadRequest('帐号密码错误')
+        # 3.2如果密码正确则得到用户对象
+
+        # 4.绑定：　创建一个OAuthQQUser对像
+        OAuthQQUser.objects.create(user=user, openid=openid)
+        # 5.状态保持
+        login(request, user)
+        response = redirect('/')
+        response.set_cookie('username',user.username,max_age=60*6)
+        # 响应
+        return response
