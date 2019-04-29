@@ -8,6 +8,8 @@ from django.contrib.auth import login, logout
 from django_redis import get_redis_connection
 from django.contrib.auth import authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
+import json
+from meiduo_mall.utils.response_code import RETCODE
 
 
 class RegisterView(View):
@@ -107,7 +109,7 @@ class LoginView(View):
         # 接受
         username = request.POST.get('username')
         pwd = request.POST.get('pwd')
-        next_url = request.GET.get('next','/')
+        next_url = request.GET.get('next', '/')
         # 　验证
         if not all([pwd, username]):
             return http.HttpResponseBadRequest('参数不完整')
@@ -145,8 +147,9 @@ class LogoutView(View):
         response.delete_cookie('username')
         return response
 
+
 # 判断是否登录
-class InfoView(LoginRequiredMixin,View):
+class InfoView(LoginRequiredMixin, View):
     def get(self, request):
         # if not request.user.is_authenticated:
         #     return redirect('/login/')
@@ -156,4 +159,34 @@ class InfoView(LoginRequiredMixin,View):
             'email': request.user.email,
             'email_active': request.user.email_active
         }
-        return render(request, 'user_center_info.html',context)
+        return render(request, 'user_center_info.html', context)
+
+
+class EmailView(LoginRequiredMixin, View):
+    def put(self, request):
+        # 接收
+        dict1 = json.loads(request.body.decode())
+        email = dict1.get('email')
+
+        # 验证
+        if not all([email]):
+            return http.JsonResponse({
+                'code': RETCODE.PARAMERR,
+                'errmsg': '没有邮箱数据'
+            })
+        if not re.match('^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$', email):
+            return http.JsonResponse({
+                'code': RETCODE.PARAMERR,
+                'errmsg': '邮箱格式错误'
+            })
+
+        # 处理
+        user = request.user
+        user.email = email
+        user.save()
+
+        # 响应
+        return http.JsonResponse({
+            'code': RETCODE.OK,
+            'errmsg': 'ok'
+        })
