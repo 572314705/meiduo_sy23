@@ -11,7 +11,8 @@ class User(AbstractUser):
     """自定义用户模型类"""
     #　手机类
     mobile = models.CharField(max_length=11, unique=True, verbose_name='手机号')
-
+    # 检查邮箱登录状态
+    email_active = models.BooleanField(default=False, verbose_name='邮箱验证状态')
     class Meta:
         #  指定表名
         db_table = 'tb_users'

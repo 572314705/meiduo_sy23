@@ -64,7 +64,10 @@ class QQopenidView(View):
                 return render(request, 'oauth_callback.html', context)
             else:
                 # 查找到绑定的用户，就状态保持
-                pass
+                login(request,qq_user.user)
+                response = redirect(next_url)
+                response.set_cookie('username',qq_user.user.username)
+                return response
         except:
             openid = 0
         return http.HttpResponse(openid)
@@ -77,6 +80,7 @@ class QQopenidView(View):
         pic_code = request.POST.get('pic_code')
         sms_code = request.POST.get('sms_code')
         token = request.POST.get('access_token')
+
         # 验证 ：非空　格式　短信验证　与注册相同　不再重复
         # 解密openid
 
