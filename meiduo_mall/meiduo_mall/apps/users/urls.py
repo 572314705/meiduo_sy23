@@ -12,5 +12,6 @@ urlpatterns = [
     # login_required装饰器 判断用户是否登录
     # url(r'^info/$', login_required(views.InfoView.as_view())),
     url(r'^info/$', views.InfoView.as_view()),
-    url(r'^emails/$',views.EmailView.as_view())
+    url(r'^emails/$',views.EmailView.as_view()),
+    url(r'^emails/verification/$',views.EmailActiveView.as_view()),
 ]

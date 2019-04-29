@@ -12,4 +12,5 @@ celery_app.autodiscover_tasks(['celery_tasks.sms'])
 # 自动识别任务
 celery_app.autodiscover_tasks([
     'celery_tasks.sms',
+    'celery_tasks.mail'
 ])

@@ -10,6 +10,10 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
 import json
 from meiduo_mall.utils.response_code import RETCODE
+from celery_tasks.mail.tasks import send_user_email
+from django.conf import settings
+from meiduo_mall.utils import meiduo_signatrue
+from . import contants
 
 
 class RegisterView(View):
@@ -185,8 +189,39 @@ class EmailView(LoginRequiredMixin, View):
         user.email = email
         user.save()
 
+        # 　调用发邮件的任务
+
+        token = meiduo_signatrue.dumps({'user_id': user.id}, contants.EMAIL_ACTIVE_EXPIRES)
+
+        url = settings.EMAIL_ACTIVE_URL + '?token=%s' % token
+
+        send_user_email(email, url)
+
         # 响应
         return http.JsonResponse({
             'code': RETCODE.OK,
             'errmsg': 'ok'
         })
+
+
+class EmailActiveView(View):
+    def get(self, request):
+        # 接收
+        token = request.GET.get('token')
+        # 　验　证
+        if not all([token]):
+            return http.HttpResponseBadRequest('参数不完整')
+        json = meiduo_signatrue.loads(token, contants.EMAIL_ACTIVE_EXPIRES)
+        if json is None:
+            return http.HttpResponseBadRequest('激活链接无效')
+        user_id = json.get('user_id')
+        # 处理
+        try:
+            user = User.objects.get(pk=user_id)
+        except:
+            return http.HttpResponseBadRequest('激活链接无效')
+        else:
+            user.email_active = True
+            user.save()
+        # 响应
+        return redirect('/info/')
