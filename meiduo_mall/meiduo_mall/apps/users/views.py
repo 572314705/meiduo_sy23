@@ -225,3 +225,10 @@ class EmailActiveView(View):
             user.save()
         # 响应
         return redirect('/info/')
+
+
+class AddressView(LoginRequiredMixin,View):
+    """新增收货地址"""
+    def get(self,request):
+        """提供收货地址界面"""
+        return render(request, 'user_center_site.html')
